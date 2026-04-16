@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>2024 Game Industry Layoffs</title>
+<link rel="stylesheet" href="assets/css/style.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+
+<header>
+  <h1>2024 Game Industry <span>Layoffs</span></h1>
+  <p>Interactive overview of studio closures and workforce reductions across the gaming industry.</p>
+</header>
+
+<div class="stat-bar" id="stat-bar">
+  <!-- populated by JS -->
+</div>
+
+<div class="controls">
+  <div>
+    <label for="filter-type">Type</label>
+    <select id="filter-type">
+      <option value="">All Types</option>
+    </select>
+  </div>
+  <div>
+    <label for="filter-month">Month</label>
+    <select id="filter-month">
+      <option value="">All Months</option>
+    </select>
+  </div>
+  <div>
+    <label for="filter-parent-loc">Parent Country</label>
+    <select id="filter-parent-loc">
+      <option value="">All Countries</option>
+    </select>
+  </div>
+  <div>
+    <label for="search">Search</label>
+    <input type="text" id="search" placeholder="Studio or parent name…">
+  </div>
+  <button class="btn-reset" id="btn-reset">Reset</button>
+</div>
+
+<div class="main">
+  <div class="chart-row wide">
+    <div class="card">
+      <h2>Layoffs by Month <small>(known headcounts only)</small></h2>
+      <div class="chart-wrap" style="height:260px">
+        <canvas id="chartMonth"></canvas>
+      </div>
+    </div>
+    <div class="card">
+      <h2>By Studio Type</h2>
+      <div class="chart-wrap" style="height:260px">
+        <canvas id="chartType"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Top Studios by Known Headcount</h2>
+    <div class="chart-wrap" style="height:280px">
+      <canvas id="chartTop"></canvas>
+    </div>
+  </div>
+
+  <div class="card table-card">
+    <h2>All Layoff Events</h2>
+    <div id="result-count"></div>
+    <div class="table-wrap">
+      <table id="data-table">
+        <thead>
+          <tr>
+            <th data-col="date">Date</th>
+            <th data-col="studio">Studio</th>
+            <th data-col="headcount">Headcount</th>
+            <th data-col="parent">Parent</th>
+            <th data-col="type">Type</th>
+            <th data-col="studioLoc">Studio Location</th>
+            <th data-col="parentLoc">Parent Country</th>
+          </tr>
+        </thead>
+        <tbody id="table-body"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script src="assets/js/app.js"></script>
+</body>
+</html>
