@@ -1,8 +1,10 @@
 # Game Industry Layoffs (2024)
 
-[Dashboard](https://game-layoffs.netlify.app/)
+[Dashboard](https://game-layoffs.netlify.app/) (Hosted on Netlify)
 
-An interactive dashboard of known studio closures and workforce reductions across the gaming industry in 2024. This is meant as a demonstration of the power of web-based data visualization tools, and AI-assisted data analysis. The initial dashboard and web page with only 2024 data was created and hosted in less than a day with the help of [Claude Code](https://code.claude.com/docs/en/overview).
+An interactive dashboard of known studio closures and workforce reductions across the gaming industry in 2024. 
+
+This is meant as a demonstration of the power of web-based data visualization tools, and AI-assisted data analysis. The initial dashboard and web page with only 2024 data was created and hosted in less than a day with the help of [Claude Code](https://code.claude.com/docs/en/overview).
 
 ## Features
 
