@@ -332,6 +332,16 @@ function init(rawData) {
   refresh();
 }
 
+// ─── About modal ─────────────────────────────────────────────────────────────
+const overlay   = document.getElementById('modal-overlay');
+const btnAbout  = document.getElementById('btn-about');
+const btnClose  = document.getElementById('modal-close');
+
+btnAbout.addEventListener('click', () => { overlay.hidden = false; });
+btnClose.addEventListener('click', () => { overlay.hidden = true; });
+overlay.addEventListener('click', e => { if (e.target === overlay) overlay.hidden = true; });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') overlay.hidden = true; });
+
 // ─── Load data ────────────────────────────────────────────────────────────────
 fetch('assets/data/data.csv')
   .then(r => r.text())

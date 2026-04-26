@@ -10,9 +10,34 @@
 <body>
 
 <header>
-  <h1>2024 Game Industry <span>Layoffs</span></h1>
+  <div class="header-top">
+    <h1>2024 Game Industry <span>Layoffs</span></h1>
+    <button class="btn-about" id="btn-about">About</button>
+  </div>
   <p>Interactive overview of studio closures and workforce reductions across the gaming industry.</p>
 </header>
+
+<!-- About modal -->
+<div class="modal-overlay" id="modal-overlay" hidden>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div class="modal-header">
+      <h2 id="modal-title">About This App</h2>
+      <button class="modal-close" id="modal-close" aria-label="Close">&#x2715;</button>
+    </div>
+    <div class="modal-body">
+      <h3>What is this?</h3>
+      <p>An interactive dashboard of known studio closures and workforce reductions across the gaming industry in 2024. Built as a demonstration of web-based data visualization and AI-assisted data product development — the initial version was created and deployed in less than a day with the help of <a href="https://claude.ai/code" target="_blank">Claude Code</a>.<br><br>
+
+      <a href="https://github.com/LeosonH/game-layoffs">Source Code on Github</a></p>
+
+      <h3>The data</h3>
+      <p>All records are sourced from the <a href="https://publish.obsidian.md/vg-layoffs/Archive/2024" target="_blank">Game Industry Layoffs archive</a>, meticulously collated by <a href="https://x.com/dekaf">@dekaf</a>. Each entry includes studio name, announcement date, headcount where known, parent company, studio type, and location.</p>
+
+      <h3>Who made this?</h3>
+      <p><a href="https://www.linkedin.com/in/leoson-hoay/">Leoson Hoay</a><br><br>Any feedback, suggestions, or notes are welcome — contact us at <a href="mailto:admin@eightways.org">admin@eightways.org</a>.</p>
+    </div>
+  </div>
+</div>
 
 <div class="stat-bar" id="stat-bar">
   <!-- populated by JS -->
