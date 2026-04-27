@@ -1,6 +1,6 @@
 # Game Industry Layoffs (2022–2025)
 
-[Dashboard](https://game-layoffs.netlify.app/) (Hosted on Netlify)
+[Dashboard](https://game-layoffs.netlify.app/)
 
 An interactive dashboard of known studio closures and workforce reductions across the gaming industry from 2022 to 2025.
 
