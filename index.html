@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>2024 Game Industry Layoffs</title>
+<title>Game Industry Layoffs</title>
 <link rel="stylesheet" href="assets/css/style.css">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 </head>
@@ -11,24 +11,24 @@
 
 <header>
   <div class="header-top">
-    <h1>2024 Game Industry <span>Layoffs</span></h1>
+    <h1>Game Industry <span>Layoffs</span></h1>
     <button class="btn-about" id="btn-about">About</button>
   </div>
-  <p>Interactive overview of studio closures and workforce reductions across the gaming industry.</p>
+  <p>Interactive overview of studio closures and workforce reductions across the gaming industry, 2022–2025.</p>
 </header>
 
 <!-- About modal -->
 <div class="modal-overlay" id="modal-overlay" hidden>
   <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
     <div class="modal-header">
-      <h2 id="modal-title">About This App</h2>
+      <h2 id="modal-title">About This Page</h2>
       <button class="modal-close" id="modal-close" aria-label="Close">&#x2715;</button>
     </div>
     <div class="modal-body">
       <h3>What is this?</h3>
-      <p>An interactive dashboard of known studio closures and workforce reductions across the gaming industry in 2024. Built as a demonstration of web-based data visualization and AI-assisted data product development — the initial version was created and deployed in less than a day with the help of <a href="https://claude.ai/code" target="_blank">Claude Code</a>.<br><br>
-
-      <a href="https://github.com/LeosonH/game-layoffs">Source Code on Github</a></p>
+      <p>An interactive dashboard of known studio closures and workforce reductions across the gaming industry from 2022-2025.<br><br>
+      <a href="https://github.com/LeosonH/game-layoffs">Source Code on Github</a><br><br>
+      Built as a demonstration of web-based data visualization and AI-assisted data product development — the initial version was created and deployed in less than a day with the help of <a href="https://claude.ai/code" target="_blank">Claude Code</a>.</p>
 
       <h3>The data</h3>
       <p>All records are sourced from the <a href="https://publish.obsidian.md/vg-layoffs/Archive/2024" target="_blank">Game Industry Layoffs archive</a>, meticulously collated by <a href="https://x.com/dekaf">@dekaf</a>. Each entry includes studio name, announcement date, headcount where known, parent company, studio type, and location.</p>
@@ -44,6 +44,12 @@
 </div>
 
 <div class="controls">
+  <div>
+    <label for="filter-year">Year</label>
+    <select id="filter-year">
+      <option value="">All Years</option>
+    </select>
+  </div>
   <div>
     <label for="filter-type">Type</label>
     <select id="filter-type">
@@ -72,23 +78,31 @@
 <div class="main">
   <div class="chart-row wide">
     <div class="card">
-      <h2>Layoffs by Month <small>(known headcounts only)</small></h2>
-      <div class="chart-wrap" style="height:260px">
-        <canvas id="chartMonth"></canvas>
+      <h2>Layoffs by Year <small>(known headcounts only)</small></h2>
+      <div class="chart-wrap" style="height:200px">
+        <canvas id="chartYear"></canvas>
       </div>
     </div>
     <div class="card">
       <h2>By Studio Type</h2>
-      <div class="chart-wrap" style="height:260px">
+      <div class="chart-wrap" style="height:200px">
         <canvas id="chartType"></canvas>
       </div>
     </div>
   </div>
 
-  <div class="card">
-    <h2>Top Studios by Known Headcount</h2>
-    <div class="chart-wrap" style="height:280px">
-      <canvas id="chartTop"></canvas>
+  <div class="chart-row wide">
+    <div class="card">
+      <h2>Layoffs by Month <small>(known headcounts only)</small></h2>
+      <div class="chart-wrap" style="height:200px">
+        <canvas id="chartMonth"></canvas>
+      </div>
+    </div>
+    <div class="card">
+      <h2>Top Studios by Known Headcount</h2>
+      <div class="chart-wrap" style="height:200px">
+        <canvas id="chartTop"></canvas>
+      </div>
     </div>
   </div>
 

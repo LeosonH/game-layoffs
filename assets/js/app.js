@@ -15,23 +15,44 @@ const COLORS = {
 Chart.defaults.color = '#8888aa';
 Chart.defaults.borderColor = '#2a2a4a';
 
-// ─── Parse CSV ────────────────────────────────────────────────────────────────
+// ─── CSV parsing (handles quoted fields) ──────────────────────────────────────
+function splitCSVLine(line) {
+  const cols = [];
+  let current = '';
+  let inQuotes = false;
+  for (let i = 0; i < line.length; i++) {
+    const ch = line[i];
+    if (ch === '"') {
+      inQuotes = !inQuotes;
+    } else if (ch === ',' && !inQuotes) {
+      cols.push(current);
+      current = '';
+    } else {
+      current += ch;
+    }
+  }
+  cols.push(current);
+  return cols;
+}
+
 function parseCSV(text) {
   const lines = text.trim().split('\n');
-  const headers = lines[0].split(',').map(h => h.trim());
+  const headers = splitCSVLine(lines[0]).map(h => h.trim());
   return lines.slice(1).map(line => {
-    const cols = line.split(',');
+    const cols = splitCSVLine(line);
     const obj = {};
     headers.forEach((h, i) => { obj[h] = (cols[i] || '').trim(); });
     return obj;
-  });
+  }).filter(obj => obj['Studio'] && obj['Studio'] !== '');
 }
 
 // ─── Date / type helpers ──────────────────────────────────────────────────────
 function parseDate(str) {
   if (!str) return null;
+  // M/D/YYYY
   const m = str.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
   if (m) return new Date(+m[3], +m[1] - 1, +m[2]);
+  // YYYY-MM-DD
   const m2 = str.match(/^(\d{4})-(\d{2})-(\d{2})$/);
   if (m2) return new Date(+m2[1], +m2[2] - 1, +m2[3]);
   return null;
@@ -58,6 +79,7 @@ function init(rawData) {
       studio:    r['Studio'] || '?',
       date,
       dateStr:   date ? `${MONTH_NAMES[date.getMonth()]} ${date.getDate()}, ${date.getFullYear()}` : r['Date'],
+      year:      date ? date.getFullYear() : null,
       month:     date ? date.getMonth() : null,
       headcount: isNaN(hc) ? null : hc,
       parent:    r['Parent'] || '',
@@ -70,15 +92,21 @@ function init(rawData) {
   // ─── Populate filter dropdowns ────────────────────────────────────────────
   function unique(arr) { return [...new Set(arr)].filter(Boolean).sort(); }
 
-  const types = unique(data.map(d => d.type));
-  const months = [0,1,2,3,4,5,6,7,8,9,10,11]
-    .filter(m => data.some(d => d.month === m));
+  const years      = unique(data.map(d => d.year)).map(Number).sort((a, b) => a - b);
+  const types      = unique(data.map(d => d.type));
   const parentLocs = unique(data.map(d => d.parentLoc));
 
+  const yearSelect  = document.getElementById('filter-year');
   const typeSelect  = document.getElementById('filter-type');
   const monthSelect = document.getElementById('filter-month');
   const plSelect    = document.getElementById('filter-parent-loc');
   const searchInput = document.getElementById('search');
+
+  years.forEach(y => {
+    const o = document.createElement('option');
+    o.value = y; o.textContent = y;
+    yearSelect.appendChild(o);
+  });
 
   types.forEach(t => {
     const o = document.createElement('option');
@@ -86,9 +114,10 @@ function init(rawData) {
     typeSelect.appendChild(o);
   });
 
-  months.forEach(m => {
+  // Month dropdown always shows all 12
+  MONTH_NAMES.forEach((name, i) => {
     const o = document.createElement('option');
-    o.value = m; o.textContent = MONTH_NAMES[m];
+    o.value = i; o.textContent = name;
     monthSelect.appendChild(o);
   });
 
@@ -128,14 +157,51 @@ function init(rawData) {
   }
 
   // ─── Charts ───────────────────────────────────────────────────────────────
-  let chartMonth, chartType, chartTop;
+  let chartYear, chartMonth, chartType, chartTop;
+
+  function buildYearChart(filtered) {
+    const ctx = document.getElementById('chartYear').getContext('2d');
+    const counts = {};
+    years.forEach(y => { counts[y] = 0; });
+    filtered.forEach(d => { if (d.year) counts[d.year] = (counts[d.year] || 0) + (d.headcount || 0); });
+    const labels = years.map(String);
+    const values = years.map(y => counts[y]);
+
+    if (chartYear) chartYear.destroy();
+    chartYear = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels,
+        datasets: [{
+          label: 'Jobs Lost',
+          data: values,
+          backgroundColor: 'rgba(233,69,96,0.7)',
+          borderColor: '#e94560',
+          borderWidth: 1,
+          borderRadius: 4,
+        }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: { callbacks: { label: c => ` ${c.parsed.y.toLocaleString()} jobs` } }
+        },
+        scales: {
+          x: { grid: { color: '#1e1e3a' }, ticks: { color: '#8888aa' } },
+          y: { grid: { color: '#1e1e3a' }, ticks: { color: '#8888aa' }, beginAtZero: true }
+        }
+      }
+    });
+  }
 
   function buildMonthChart(filtered) {
     const ctx = document.getElementById('chartMonth').getContext('2d');
     const monthly = Array(12).fill(0);
     filtered.forEach(d => { if (d.month !== null && d.headcount) monthly[d.month] += d.headcount; });
-    const labels = months.map(m => MONTH_NAMES[m]);
-    const values = months.map(m => monthly[m]);
+    const activeMonths = [0,1,2,3,4,5,6,7,8,9,10,11].filter(m => filtered.some(d => d.month === m));
+    const labels = activeMonths.map(m => MONTH_NAMES[m]);
+    const values = activeMonths.map(m => monthly[m]);
 
     if (chartMonth) chartMonth.destroy();
     chartMonth = new Chart(ctx, {
@@ -292,17 +358,19 @@ function init(rawData) {
 
   // ─── Filter & refresh ─────────────────────────────────────────────────────
   function getFiltered() {
+    const fYear  = yearSelect.value;
     const fType  = typeSelect.value;
     const fMonth = monthSelect.value;
     const fPL    = plSelect.value;
     const q      = searchInput.value.trim().toLowerCase();
 
     return data.filter(d => {
-      if (fType  && d.type !== fType)                           return false;
-      if (fMonth !== '' && d.month !== +fMonth)                 return false;
-      if (fPL    && d.parentLoc !== fPL)                        return false;
+      if (fYear  && d.year      !== +fYear)                       return false;
+      if (fType  && d.type      !== fType)                        return false;
+      if (fMonth !== '' && d.month !== +fMonth)                   return false;
+      if (fPL    && d.parentLoc !== fPL)                          return false;
       if (q && !d.studio.toLowerCase().includes(q)
-             && !d.parent.toLowerCase().includes(q))            return false;
+             && !d.parent.toLowerCase().includes(q))              return false;
       return true;
     });
   }
@@ -310,18 +378,21 @@ function init(rawData) {
   function refresh() {
     const filtered = getFiltered();
     renderStats(filtered);
+    buildYearChart(filtered);
     buildMonthChart(filtered);
     buildTypeChart(filtered);
     buildTopChart(sortData(filtered));
     renderTable(sortData(filtered));
   }
 
+  yearSelect.addEventListener('change', refresh);
   typeSelect.addEventListener('change', refresh);
   monthSelect.addEventListener('change', refresh);
   plSelect.addEventListener('change', refresh);
   searchInput.addEventListener('input', refresh);
 
   document.getElementById('btn-reset').addEventListener('click', () => {
+    yearSelect.value  = '';
     typeSelect.value  = '';
     monthSelect.value = '';
     plSelect.value    = '';
@@ -333,17 +404,29 @@ function init(rawData) {
 }
 
 // ─── About modal ─────────────────────────────────────────────────────────────
-const overlay   = document.getElementById('modal-overlay');
-const btnAbout  = document.getElementById('btn-about');
-const btnClose  = document.getElementById('modal-close');
+const overlay  = document.getElementById('modal-overlay');
+const btnAbout = document.getElementById('btn-about');
+const btnClose = document.getElementById('modal-close');
 
 btnAbout.addEventListener('click', () => { overlay.hidden = false; });
 btnClose.addEventListener('click', () => { overlay.hidden = true; });
 overlay.addEventListener('click', e => { if (e.target === overlay) overlay.hidden = true; });
 document.addEventListener('keydown', e => { if (e.key === 'Escape') overlay.hidden = true; });
 
-// ─── Load data ────────────────────────────────────────────────────────────────
-fetch('assets/data/data.csv')
-  .then(r => r.text())
-  .then(text => init(parseCSV(text)))
+// ─── Load data (all years in parallel) ───────────────────────────────────────
+Promise.all([
+  fetch('assets/data/2022.csv').then(r => r.text()),
+  fetch('assets/data/2023.csv').then(r => r.text()),
+  fetch('assets/data/2024.csv').then(r => r.text()),
+  fetch('assets/data/2025.csv').then(r => r.text()),
+])
+  .then(([d2022, d2023, d2024, d2025]) => {
+    const rawData = [
+      ...parseCSV(d2022),
+      ...parseCSV(d2023),
+      ...parseCSV(d2024),
+      ...parseCSV(d2025),
+    ];
+    init(rawData);
+  })
   .catch(err => console.error('Failed to load data:', err));
