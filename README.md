@@ -4,8 +4,6 @@
 
 An interactive dashboard of known studio closures and workforce reductions across the gaming industry from 2022 to 2025.
 
-This is meant as a demonstration of the power of web-based data visualization tools and AI-assisted data product development. The initial dashboard with 2024 data was created and hosted in less than a day with the help of [Claude Code](https://claude.ai/code).
-
 ## Features
 
 - Summary stats: total layoff events, known jobs lost, studios affected
